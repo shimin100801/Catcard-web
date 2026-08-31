@@ -1,0 +1,690 @@
+<!DOCTYPE html5>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <title>MobileID</title>
+    <!-- Jquery -->
+    <script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <!-- Bootstrap -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS-->
+    <link href="assets/css/mobileid.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div style="display: none" id="card-deactivated-alert" class="alert alert-success">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Success!</strong> Your CatCard has been deactivated.
+        </div>
+        <div style="display: none" id="card-inactive-alert" class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Error!</strong> Your CatCard is already deactivated.
+        </div>
+        <div style="display: none" id="unauthorized-alert" class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Error!</strong> Unauthorized. Try refreshing page.
+        </div>
+        <div style="display: none" id="card-error-alert" class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Error!</strong> Error deactivating card. Contact <a
+                href="mailto:catcard@ucmerced.edu">catcard@ucmerced.edu</a> if problem persists.
+        </div>
+        <div id="emergency-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Emergency Resources</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="emergency-table" cellpadding="20">
+                            <tr>
+                                <td>Police Department (any cell phone)</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a href="tel:911">Call: 911</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Police Department (any campus phone)</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    Call: 9-911
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>UC Merced Police 24 Hour Dispatch</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a href="tel:2092282677">Call: 209-228-2677</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>National Suicide Prevention Lifeline</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a href="tel:18002738255">Call: 1-800-273-8255</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Crisis Text Line</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a href="sms:741741">Text: 741741</a>
+                                </td>
+                            </tr>
+                        </table>
+                        <style>
+                            tr>td {
+                                padding: 1em 0;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+                                font-size: 14px !important;
+                            }
+                        </style>
+                        <div class="modal-footer">
+                            <button id="modal-close-emergency" type="button" class="btn btn-danger">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="lost-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Lost My CatCard</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-black">If your card is lost or stolen you can deactivate it here. Please check
+                            the box below to deactivate your CatCard.</p>
+
+                        <p class="text-black"><input type="checkbox" class="TOS-checkbox">I acknowledge that
+                            deactivating my CatCard will result in the inability to use my CatCard until it is
+                            reactivated or until I acquire a new CatCard at the CatCard office. I understand that it is
+                            my responsibility to acquire a new CatCard within three (3) business days if my lost card is
+                            not found. You can visit the CatCard office between 9:00a - 4:00p, Monday - Friday.</p>
+                        <p class="text-warning"><small>If you have any questions about this process, please contact the
+                                CatCard office by email <a href="mailto:catcard@ucmerced.edu">catcard@ucmerced.edu</a>
+                                or by phone 209.228.2228.</small></p>
+                        <div class="modal-footer">
+                            <button id="modal-mark-lost" type="button" class="btn btn-danger">Mark as Lost</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="resource-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Resources</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="resource-table" cellpadding="20" style="border-collapse: separate;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Campus Resources
+                                    </th>
+                                    <th>
+                                        COVID19
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <a href="https://studentsfirst.ucmerced.edu/" target="_blank">Student First
+                                            Center</a>
+                                    </td>
+                                    <td>
+                                        <a href="https://emergency.ucmerced.edu/coronavirus" target="_blank">UC
+                                            Merced</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://health.ucmerced.edu/" target="_blank">Health Department</a>
+                                    </td>
+                                    <td>
+                                        <a href="https://www.cdc.gov/coronavirus/2019-ncov/index.html"
+                                            target="_blank">CDC</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://counseling.ucmerced.edu/" target="_blank">Counseling
+                                            Department</a>
+                                    </td>
+                                    <td>
+                                        <a href="https://www.mercedsunstar.com/news/coronavirus/" target="_blank">Merced
+                                            Sun-Star</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://housing.ucmerced.edu/" target="_blank">Housing Department</a>
+                                    </td>
+                                    <td>
+                                        <a href="https://www.google.com/amp/s/mercedcountytimes.com/amp/health-officials-confirm-first-case-of-covid-19-in-merced-county/"
+                                            target="_blank">World Health Organization</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://dining.ucmerced.edu/" target="_blank">Dining Services</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="http://catcard.ucmerced.edu/" target="_blank">CatCard Services</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://taps.ucmerced.edu/" target="_blank">Transportation Services</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://facilities.ucmerced.edu/" target="_blank">Facilities
+                                            Department</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://bfs.ucmerced.edu/" target="_blank">Business and Financial
+                                            Services</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://it.ucmerced.edu/" target="_blank">IT Department</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://studentlife.ucmerced.edu/" target="_blank">Office of Student
+                                            Life</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://hire.ucmerced.edu/" target="_blank">Center for Career &
+                                            Professional Advancement</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.ucmerced.edu/athletics-and-recreation"
+                                            target="_blank">Athletics and Recreation</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://basicneeds.ucmerced.edu/" target="_blank">Basic Needs
+                                            Security</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.google.com/maps/place/University+of+California+Merced/@37.3649385,-120.4291248,16z/data=!4m5!3m4!1s0x809146ac0c97b9d5:0xcc8a56b52388a814!8m2!3d37.3660652!4d-120.4224179?hl=en
+" target="_blank">Maps and Directions</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <style>
+                            table#resource-table {
+                                width: 100%;
+                            }
+
+                            tr>td {
+                                padding: 1em 0;
+                                /* border-bottom: 1px solid rgba(0, 0, 0, 0.5); */
+                            }
+
+                            th:first-child,
+                            td:first-child {
+                                border-right: 1px solid #000;
+                                padding-right: 2%;
+                            }
+
+                            tr {
+                                padding-right: 2%;
+                            }
+
+                            th:not(:first-child),
+                            td:not(:first-child) {
+                                padding-left: 2%;
+                            }
+                        </style>
+                        <div class="modal-footer">
+                            <button id="modal-close-resource" type="button" class="btn btn-danger">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="row is-flex" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5em;">
+            <!-- Left: UC Merced Logo -->
+            <div class="col-xs-2">
+                <a href="/mobileid">
+                    <img class="text-left" src="images/ucm3.png" height="60px" alt="UC Merced Logo">
+                </a>
+            </div>
+
+            <!-- Center: Empty space (preserve spacing) -->
+            <div class="col-xs-8 text-center">
+                <img class="text-left" src="images/mobileid_logo.png" height="60px" alt="UC Merced Logo">
+            </div>
+
+            <!-- Right: Empty space (preserve spacing) -->
+            <div class="col-xs-2 text-right">
+                <!-- Intentionally left blank to maintain spacing -->
+            </div>
+        </div>
+        <hr style="margin-top: 5px; margin-bottom: 5px;">
+
+        <!-- Centered Profile Section -->
+        <div class="text-center" style="margin-top: 2em;">
+            <a href="profile.php" id="setting-icon">
+                <img src="images/profile.png"
+                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4); transition: transform 0.3s ease-in-out;"
+                    class="img-circle" alt="User profile picture">
+            </a>
+
+            <h4 class="white-h4" style="margin-top: 0.5em; color: white !important;">
+                Ben Done            </h4>
+
+            <h4 id="student-id" class="white-h4" style="color: white !important;">
+                100399684            </h4>
+
+            <!-- Pay/Check-in Button -->
+            <div id="show-info-button" style="margin-top: 1em;">
+                <button type="button" class="btn btn-trans btn-trans-default"><b>PAY / Check-in</b></button>
+            </div>
+
+
+        </div>
+
+        <div id="qrcode" class="text-center">
+            <div id="qrcode-div" style="display: none;">Barcode</div>
+            <br>
+            <div id="qrcode-code" style="height: 10%">
+                <div class="progress center-block">
+                    <div class="progress-bar progress-bar-white" role="progressbar" aria-valuenow="100"
+                        aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="margin: auto; max-width: 320px;">
+            <div class="grid-container">
+                <!-- First Row -->
+                <a href="https://mybill.ucmerced.edu" class="btn-grid">
+                    <i class="fa fa-credit-card fa-2x"></i>
+                    <p>Add Funds</p>
+                </a>
+                <a href="mperks/index.php?nav=CatCard / Ozzi Balance" class="btn-grid">
+                    <i class="fa fa-money-bill fa-2x"></i>
+                    <p>Balance</p>
+                </a>
+                <a id="lost-my-card" href="#" class="btn-grid">
+                    <i class="fa fa-id-card fa-2x"></i>
+                    <p>Lost My Card</p>
+                </a>
+
+                <!-- Second Row -->
+                <a id="emergency" href="#" class="btn-grid">
+                    <i class="fa fa-exclamation-triangle fa-2x"></i>
+                    <p>Emergency</p>
+                </a>
+                <a id="gym" href="#" class="btn-grid">
+                    <i class="fa fa-dumbbell fa-2x"></i>
+                    <p>Gym</p>
+                </a>
+                <a id="resource" href="#" class="btn-grid">
+                    <i class="fa fa-info fa-2x"></i>
+                    <p>Resources</p>
+                </a>
+
+                <!-- Third Row -->
+                <a href="opendoors.php" class="btn-grid"
+                    style="display: none;">
+                    <img src="images/open-door.png" width="28px" height="28px" />
+                    <p>Open Door</p>
+                </a>
+                <a href="?logout=" class="btn-grid">
+                    <i class="fa fa-sign-out-alt fa-2x"></i>
+                    <p>Log out</p>
+                </a>
+            </div>
+        </div>
+        <!--Container-->
+
+        <!-- Barcode -->
+        <script src="assets/js/bcmath-min.js" type="text/javascript"></script>
+        <script src="assets/js/pdf417-min.js" type="text/javascript"></script>
+
+        <script>
+            var rand_count = 0;
+            var mobileid_rand_array = [3503,2540,2002,6910,8389,4306,7006,3705,4766,3820];
+            
+            /* Toggle fade between barcode and code on touch */
+            $('#show-info-button').click(function() {
+                // Get current timestamp (in seconds)
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = String(now.getMonth() + 1).padStart(2, '0');
+                var date = String(now.getDate()).padStart(2, '0');
+                var hours = String(now.getHours()).padStart(2, '0');
+                var minutes = String(now.getMinutes()).padStart(2, '0');
+                var seconds = String(now.getSeconds()).padStart(2, '0');
+
+                var formattedTimestamp = year + month + date + hours + minutes + seconds;
+
+                // Append the timestamp to the magstrip value
+                var magstripWithTimestamp = formattedTimestamp + "6361830000658369";//"62406038793083";
+
+                // Initialize PDF417 with the new magstrip value
+                PDF417.init(magstripWithTimestamp);
+
+                var barcode = PDF417.getBarcodeArray();
+
+                // block sizes (width and height) in pixels
+                var bw = 2.5;
+                var bh = 1;
+
+                // create canvas element based on number of columns and rows in barcode
+                var container = document.getElementById('qrcode-div');
+                container.removeChild(container.firstChild);
+
+                var canvas = document.createElement('canvas');
+                canvas.setAttribute("id", "canvas");
+                canvas.width = bw * barcode['num_cols'];
+                canvas.height = bh * barcode['num_rows'];
+                container.appendChild(canvas);
+
+                var ctx = canvas.getContext('2d');
+
+                // graph barcode elements
+                var y = 0;
+                // for each row
+                for (var r = 0; r < barcode['num_rows']; ++r) {
+                    var x = 0;
+                    // for each column
+                    for (var c = 0; c < barcode['num_cols']; ++c) {
+                        if (barcode['bcode'][r][c] == 1) {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(x, y, bw, bh);
+                        } else {
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(x, y, bw, bh);
+                        }
+                        x += bw;
+                    }
+                    y += bh;
+                }
+
+                var isFaded = $('#show-info-button').css('display') == 'none';
+
+                if (isFaded) {
+                    setTimeout(function() {
+                        $('#show-info-button').fadeIn();
+                    }, 400);
+                    $('#student-id').fadeOut();
+                    $('#qrcode-code').fadeOut();
+                    $('#qrcode-div').fadeOut();
+                } else {
+                    $('#show-info-button').fadeOut();
+
+                    setTimeout(function() {
+                        $('#qrcode-div').fadeIn();
+                        $('#qrcode-code').fadeIn();
+                        $('#student-id').fadeIn();
+
+                        // Reset progress bar width instantly (without animation)
+                        $('.progress-bar').css({
+                            "transition": "none",
+                            "width": "100%"
+                        });
+
+                        // Short delay before applying transition again for smooth animation
+                        setTimeout(function() {
+                            $('.progress-bar').css({
+                                "transition": "width 10s linear",
+                                "width": "0%"
+                            });
+                        }, 50);
+
+                    }, 400);
+
+                    // Hide barcode after 5 seconds
+                    setTimeout(function() {
+                        $('#qrcode-div').fadeOut(400);
+                        $('#qrcode-code').fadeOut(400);
+                        $('#student-id').fadeOut(400);
+                        setTimeout(function() {
+                            $('#show-info-button').fadeIn();
+                        }, 400);
+                    }, 10400); // 5 seconds + fade out time
+                }
+            });
+
+            let showBar
+            var container = document.getElementById('qrcode');
+
+            // Creates text
+            var canvas = document.createElement('div');
+            canvas.setAttribute("id", "top");
+            container.appendChild(canvas, container.firstChild);
+
+            var node = document.createElement("div");
+            node.setAttribute('id', 'top-text');
+
+            var info = document.createElement("a");
+            info.setAttribute('id', 'top-info');
+            var textnode = document.createTextNode("Present barcode at front desk.");
+            info.appendChild(textnode);
+            node.appendChild(info);
+            node.appendChild(document.createElement('br'));
+
+            var hours = document.createElement("a");
+            hours.setAttribute('id', 'top-hours');
+            var texthours = document.createTextNode("For facilities hours, click here.");
+            hours.appendChild(texthours);
+            node.appendChild(hours);
+
+            node.appendChild(document.createElement("br"));
+
+            var btn = document.createElement("button");
+            btn.setAttribute("id", "logger");
+
+            var n = document.createElement("a");
+            n.setAttribute('id', 'logger-text');
+            var tn = document.createTextNode("Activity Logger, click here.");
+            n.appendChild(tn);
+            node.appendChild(n);
+
+            document.getElementById("top").style.display = "none";
+
+            /* Toggle fade between barcode and code on touch */
+            $('#gym').click(function() {
+                PDF417.init("6361830000559666");
+
+                var barcode = PDF417.getBarcodeArray();
+
+                // block sizes (width and height) in pixels
+                var bw = 2.5;
+                var bh = 1;
+
+                // create canvas element based on number of columns and rows in barcode
+                var container = document.getElementById('qrcode-div');
+                container.removeChild(container.firstChild);
+
+                var canvas = document.createElement('canvas');
+                canvas.setAttribute("id", "canvas");
+                canvas.width = bw * barcode['num_cols'];
+                canvas.height = bh * barcode['num_rows'];
+                container.appendChild(canvas);
+
+                var ctx = canvas.getContext('2d');
+
+                // graph barcode elements
+                var y = 0;
+                // for each row
+                for (var r = 0; r < barcode['num_rows']; ++r) {
+                    var x = 0;
+                    // for each column
+                    for (var c = 0; c < barcode['num_cols']; ++c) {
+                        if (barcode['bcode'][r][c] == 1) {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(x, y, bw, bh);
+                        } else {
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(x, y, bw, bh);
+                        }
+                        x += bw;
+                    }
+                    y += bh;
+                }
+
+                //makes sure text does not repeat
+                var top = document.getElementById("top");
+                if (top.firstChild) {
+                    top.removeChild(top.firstChild);
+                }
+                top.appendChild(node, top.firstChild);
+
+                document.getElementById("top-info").style.color = "white";
+                document.getElementById("top-info").style.textDecoration = "none";
+
+                // provides text with link and styling
+                canvas.appendChild(document.createElement("br"));
+                document.getElementById("top-hours").href = "https://recreation.ucmerced.edu/Facility-Hours";
+                document.getElementById("top-hours").target = "_blank";
+                document.getElementById("top-hours").style.color = "#BF9C44";
+
+                canvas.appendChild(btn, container.firstChild);
+                canvas.appendChild(document.createElement("br"));
+                document.getElementById("logger-text").style.margin = "0 0 10px 0";
+                document.getElementById("logger-text").href = "gym/";
+                document.getElementById("logger-text").style.color = "#BF9C44";
+
+                var isFaded = $('#show-info-button').css('display') == 'none';
+                switch (document.getElementById("top").style.display) {
+                    case 'none':
+                        document.getElementById("top").style.display = "block";
+                        break;
+                    case 'block':
+                        document.getElementById("top").style.display = "none";
+                        break;
+                }
+            });
+
+            $(function() {
+                var currImageIndex = 0;
+                var images = ['images/rolling_images/Commitment.jpg', 'images/rolling_images/Persevere.jpg', 'images/rolling_images/Success.jpg'];
+
+                function fadeThroughImages() {
+                    setTimeout(function() {
+                        $('#header-img').fadeOut('400', function() {
+                            currImageIndex++;
+                            $('#header-img').attr('src',
+                                images[currImageIndex % images.length]);
+                            // Wait for image to load before fading back in
+                            setTimeout(function() {
+                                $('#header-img').fadeIn('400', function() {
+                                    fadeThroughImages();
+                                });
+                            }, 1000);
+                        });
+                    }, 4000);
+                }
+
+                // Show emergency modal when user clicks 'Emergency'
+                $('#emergency').click(function() {
+                    $('#emergency-modal').modal('show')
+                });
+
+                $('#modal-close-emergency').click(function() {
+                    $('#emergency-modal').modal('hide');
+                });
+
+                $('#resource').click(function() {
+                    $('#resource-modal').modal('show');
+                });
+
+                $('#modal-close-resource').click(function() {
+                    $('#resource-modal').modal('hide');
+                });
+
+                // Show lost modal when user clicks 'Lost my Card'
+                $('#lost-my-card').click(function() {
+                    if (1 == 0) {
+                        $("#card-inactive-alert").fadeIn()
+                        return
+                    }
+                    console.log('Showing modal')
+                    $('#lost-modal').modal('show')
+                });
+
+                $('#modal-mark-lost').click(function() {
+                    console.log('Clicking modal')
+                    var checkedVal = $('.TOS-checkbox:checked').val()
+                    if (!checkedVal) {
+                        console.log('Show error')
+                        return
+                    }
+                });
+
+                function myFunction() {
+                    window.location.href = "?logout=";
+                }
+
+                function listener() {
+                    window.time = 1000000,
+                    delta = 100,
+
+                    window.tid = setInterval(function() {
+                        window.time -= delta;
+                        if (time <= 0) {
+                            clearInterval(window.tid);
+                            myFunction(); // time passed - do your work
+                        }
+                    }, delta);
+                };
+
+                listener();
+
+                $(document).on('keyup keypress blur change mousemove', function() {
+                    clearInterval(window.tid);
+                    listener();
+                });
+            });
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,850 @@
+
+<!-- Matomo -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//icatcard.ucmerced.edu/mobileid/piwik/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+<!DOCTYPE html5>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>MobileID</title>
+    <!-- Jquery -->
+    <script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <!-- Bootstrap -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS-->
+    <link href="assets/css/mobileid.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div style="display: none" id="card-deactivated-alert" class="alert alert-success">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Success!</strong> Your CatCard has been deactivated.
+        </div>
+        <div style="display: none" id="card-inactive-alert" class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Error!</strong> Your CatCard is already deactivated.
+        </div>
+        <div style="display: none" id="unauthorized-alert" class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Error!</strong> Unauthorized. Try refreshing page.
+        </div>
+        <div style="display: none" id="card-error-alert" class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Error!</strong> Error deactivating card. Contact <a
+                href="mailto:catcard@ucmerced.edu">catcard@ucmerced.edu</a> if problem persists.
+        </div>
+        <div id="emergency-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Emergency Resources</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="emergency-table" cellpadding="20">
+                            <tr>
+                                <td>Police Department (any cell phone)</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a href="tel:911">Call: 911</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Police Department (any campus phone)</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    Call: 9-911
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>UC Merced Police 24 Hour Dispatch</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a href="tel:2092282677">Call: 209-228-2677</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>National Suicide Prevention Lifeline</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a href="tel:18002738255">Call: 1-800-273-8255</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Crisis Text Line</td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a href="sms:741741">Text: 741741</a>
+                                </td>
+                            </tr>
+                        </table>
+                        <style>
+                            tr>td {
+                                padding: 1em 0;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+                                font-size: 14px !important;
+                            }
+                        </style>
+                        <div class="modal-footer">
+                            <button id="modal-close-emergency" type="button" class="btn btn-danger">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="lost-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Lost My CatCard</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-black">If your card is lost or stolen you can deactivate it here. Please check
+                            the box below to deactivate your CatCard.</p>
+
+                        <p class="text-black"><input type="checkbox" class="TOS-checkbox">I acknowledge that
+                            deactivating my CatCard will result in the inability to use my CatCard until it is
+                            reactivated or until I acquire a new CatCard at the CatCard office. I understand that it is
+                            my responsibility to acquire a new CatCard within three (3) business days if my lost card is
+                            not found. You can visit the CatCard office between 9:00a - 4:00p, Monday - Friday.</p>
+                        <p class="text-warning"><small>If you have any questions about this process, please contact the
+                                CatCard office by email <a href="mailto:catcard@ucmerced.edu">catcard@ucmerced.edu</a>
+                                or by phone 209.228.2228.</small></p>
+                        <div class="modal-footer">
+                            <button id="modal-mark-lost" type="button" class="btn btn-danger">Mark as Lost</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="resource-modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Resources</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="resource-table" cellpadding="20" style="border-collapse: separate;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Campus Resources
+                                    </th>
+                                    <th>
+                                        COVID19
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <a href="https://studentsfirst.ucmerced.edu/" target="_blank">Student First
+                                            Center</a>
+                                    </td>
+                                    <td>
+                                        <a href="https://emergency.ucmerced.edu/coronavirus" target="_blank">UC
+                                            Merced</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://health.ucmerced.edu/" target="_blank">Health Department</a>
+                                    </td>
+                                    <td>
+                                        <a href="https://www.cdc.gov/coronavirus/2019-ncov/index.html"
+                                            target="_blank">CDC</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://counseling.ucmerced.edu/" target="_blank">Counseling
+                                            Department</a>
+                                    </td>
+                                    <td>
+                                        <a href="https://www.mercedsunstar.com/news/coronavirus/" target="_blank">Merced
+                                            Sun-Star</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://housing.ucmerced.edu/" target="_blank">Housing Department</a>
+                                    </td>
+                                    <td>
+                                        <a href="https://www.google.com/amp/s/mercedcountytimes.com/amp/health-officials-confirm-first-case-of-covid-19-in-merced-county/"
+                                            target="_blank">World Health Organization</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://dining.ucmerced.edu/" target="_blank">Dining Services</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="http://catcard.ucmerced.edu/" target="_blank">CatCard Services</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://taps.ucmerced.edu/" target="_blank">Transportation Services</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://facilities.ucmerced.edu/" target="_blank">Facilities
+                                            Department</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://bfs.ucmerced.edu/" target="_blank">Business and Financial
+                                            Services</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://it.ucmerced.edu/" target="_blank">IT Department</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://studentlife.ucmerced.edu/" target="_blank">Office of Student
+                                            Life</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://hire.ucmerced.edu/" target="_blank">Center for Career &
+                                            Professional Advancement</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.ucmerced.edu/athletics-and-recreation"
+                                            target="_blank">Athletics and Recreation</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://basicneeds.ucmerced.edu/" target="_blank">Basic Needs
+                                            Security</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.google.com/maps/place/University+of+California+Merced/@37.3649385,-120.4291248,16z/data=!4m5!3m4!1s0x809146ac0c97b9d5:0xcc8a56b52388a814!8m2!3d37.3660652!4d-120.4224179?hl=en
+" target="_blank">Maps and Directions</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <style>
+                            table#resource-table {
+                                width: 100%;
+                            }
+
+                            tr>td {
+                                padding: 1em 0;
+                                /* border-bottom: 1px solid rgba(0, 0, 0, 0.5); */
+                            }
+
+                            th:first-child,
+                            td:first-child {
+                                border-right: 1px solid #000;
+                                padding-right: 2%;
+                            }
+
+                            tr {
+                                padding-right: 2%;
+                            }
+
+                            th:not(:first-child),
+                            td:not(:first-child) {
+                                padding-left: 2%;
+                            }
+                        </style>
+                        <div class="modal-footer">
+                            <button id="modal-close-resource" type="button" class="btn btn-danger">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="row is-flex" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5em;">
+            <!-- Left: UC Merced Logo -->
+            <div class="col-xs-2">
+                <a href="/mobileid">
+                    <img class="text-left" src="images/ucm3.png" height="60px" alt="UC Merced Logo">
+                </a>
+            </div>
+
+            <!-- Center: Empty space (preserve spacing) -->
+            <div class="col-xs-8 text-center">
+                <img class="text-left" src="images/mobileid_logo.png" height="60px" alt="UC Merced Logo">
+            </div>
+
+            <!-- Right: Empty space (preserve spacing) -->
+            <div class="col-xs-2 text-right">
+                <!-- Intentionally left blank to maintain spacing -->
+            </div>
+        </div>
+        <hr style="margin-top: 5px; margin-bottom: 5px;">
+
+        <!-- Centered Profile Section -->
+        <div class="text-center" style="margin-top: 2em;">
+            <a href="profile.php" id="setting-icon">
+                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBXgFeAAD/7QCcUGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAGQcAVoAAxslRxwCAAACAAIcAj8ABjE4MjMwNRwCPgAIMjAxODAzMDMcAjcACDIwMTgwMzAzHAI8AAsxODIzMDUrMDAwMBwCQQAaQWRvYmUgUGhvdG9zaG9wIENTIFdpbmRvd3MAOEJJTQQlAAAAAAAQoyDHAXWFqGrhkSQmAD4C9//hE9xFeGlmAABNTQAqAAAACAAXAQ8AAgAAABIAAAkuARAAAgAAAAwAAAlAARIAAwAAAAEAAQAAARoABQAAAAEAAAlMARsABQAAAAEAAAlUASgAAwAAAAEAAgCwATEAAgAAABsAAAlcATIAAgAAABQAAAl4h2kABAAAAAEAAAmMiCUABAAAAAEAABO4iDAAAwAAAAEAAhABpAEAAwAAAAEAAAACpAIAAwAAAAEAAQABpAMAAwAAAAEAAAAHpAQABQAAAAEAABPMpAUAAwAAAAEATgADpAYAAwAAAAEAAgADpAcAAwAAAAEAAAAJpAgAAwAAAAEAAAAMpAkAAwAAAAEAAAAKpAoAAwAAAAEAAAALpAwAAwAAAAEAAAAM6hwABwAACAwAAAEiAAAAABzqAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATklLT04gQ09SUE9SQVRJT04ATklLT04gRDMzMDAAAAABXgAAAAEAAAFeAAAAAUFkb2JlIFBob3Rvc2hvcCBDUyBXaW5kb3dzAAAyMDE4OjAzOjAzIDE4OjIxOjQ4AAAhgpoABQAAAAEAABMqgp0ABQAAAAEAABMyiCIAAwAAAAEAAQAAiCcAAwAAAAEAZAAAkAAABwAAAAQwMjMwkAMAAgAAABQAABM6kAQAAgAAABQAABNOkQEABwAAAAQBAgMAkQIABQAAAAEAABNikgQABQAAAAEAABNqkgUABQAAAAEAABNykgcAAwAAAAEABQAAkggAAwAAAAEAAAAAkgkAAwAAAAEAAAAAkgoABQAAAAEAABN6koYABwAAACwAABOCkpAAAgAAAAM0MACCkpEAAgAAAAM0MAAAkpIAAgAAAAM0MAAAoAAABwAAAAQwMTAwoAEAAwAAAAEAAQAAoAIABAAAAAEAAAEXoAMABAAAAAEAAAFAohcAAwAAAAEAAoKCowAABwAAAAEDgoKCowEABwAAAAEBgoKCpAMAAwAAAAEAAAAApAQABQAAAAEAABOupAUAAwAAAAEATgAApAgAAwAAAAEAAAAApAkAAwAAAAEAAAAApAoAAwAAAAEAAAAA6hwABwAACAwAAAseAAAAABzqAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAGQAAAAFAAAAATIwMTg6MDM6MDMgMTg6MjM6MDUAMjAxODowMzowMyAxODoyMzowNQAAAAAEAAAAAQAAAAAAAAABAAAAFwAAAAUAAAA0AAAAAUFTQ0lJAAAAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAQAAAAEAAAABAAAABwAAAAQCAwAAAAAAAAAAAAAAAQAAAAH/4QndaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49J++7vycgaWQ9J1c1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCc/Pg0KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyI+PHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyI+PHhtcDpDcmVhdGVEYXRlPjIwMTgtMDMtMDNUMTg6MjM6MDUuNDAwPC94bXA6Q3JlYXRlRGF0ZT48eG1wOkNyZWF0b3JUb29sPkFkb2JlIFBob3Rvc2hvcCBDUyBXaW5kb3dzPC94bXA6Q3JlYXRvclRvb2w+PC9yZGY6RGVzY3JpcHRpb24+PC9yZGY6UkRGPjwveDp4bXBtZXRhPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8P3hwYWNrZXQgZW5kPSd3Jz8+/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8AAEQgBQAEXAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqS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"
+                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4); transition: transform 0.3s ease-in-out;"
+                    class="img-circle" alt="User profile picture">
+            </a>
+
+            <h4 class="white-h4" style="margin-top: 0.5em; color: white !important;">
+                Haolin Liang            </h4>
+
+            <h4 id="student-id" class="white-h4" style="color: white !important;">
+                100317341            </h4>
+
+            <!-- Pay/Check-in Button -->
+            <div id="show-info-button" style="margin-top: 1em;">
+                <button type="button" class="btn btn-trans btn-trans-default"><b>PAY / Check-in</b></button>
+            </div>
+
+
+        </div>
+
+        <div id="qrcode" class="text-center">
+            <div id="qrcode-div" style="display: none;">Barcode</div>
+            <br>
+            <div id="qrcode-code" style="height: 10%">
+                <div class="progress center-block">
+                    <div class="progress-bar progress-bar-white" role="progressbar" aria-valuenow="100"
+                        aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="margin: auto; max-width: 320px;">
+            <div class="grid-container">
+                <!-- First Row -->
+                <a href="https://mybill.ucmerced.edu" class="btn-grid">
+                    <i class="fa fa-credit-card fa-2x"></i>
+                    <p>Add Funds</p>
+                </a>
+                <a href="mperks/index.php?nav=CatCard / Ozzi Balance" class="btn-grid">
+                    <i class="fa fa-money-bill fa-2x"></i>
+                    <p>Balance</p>
+                </a>
+                <a id="lost-my-card" href="#" class="btn-grid">
+                    <i class="fa fa-id-card fa-2x"></i>
+                    <p>Lost My Card</p>
+                </a>
+
+                <!-- Second Row -->
+                <a id="emergency" href="#" class="btn-grid">
+                    <i class="fa fa-exclamation-triangle fa-2x"></i>
+                    <p>Emergency</p>
+                </a>
+                <a id="gym" href="#" class="btn-grid">
+                    <i class="fa fa-dumbbell fa-2x"></i>
+                    <p>Gym</p>
+                </a>
+                <a id="resource" href="#" class="btn-grid">
+                    <i class="fa fa-info fa-2x"></i>
+                    <p>Resources</p>
+                </a>
+
+                <!-- Third Row -->
+                <a href="opendoors.php" class="btn-grid"
+                    style="display: none;">
+                    <img src="images/open-door.png" width="28px" height="28px" />
+                    <p>Open Door</p>
+                </a>
+                <a href="?logout=" class="btn-grid">
+                    <i class="fa fa-sign-out-alt fa-2x"></i>
+                    <p>Log out</p>
+                </a>
+            </div>
+        </div>
+        <!--Container-->
+
+        <!-- Barcode -->
+        <!-- <script src="assets/js/qrcode.js"></script> -->
+        <script src="assets/js/bcmath-min.js" type="text/javascript"></script>
+        <script src="assets/js/pdf417-min.js" type="text/javascript"></script>
+
+        <!-- Jquery SessionTimeout
+<script src="bower_components/jquery-sessionTimeout/jquery.sessionTimeout.js"></script> -->
+
+        <script>
+            var rand_count = 0;
+            var mobileid_rand_array = [3503,2540,2002,6910,8389,4306,7006,3705,4766,3820];
+            /* Toggle fade between barcode and code on touch */
+            $('#show-info-button').click(function() {
+                // Get current timestamp (in seconds)
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = String(now.getMonth() + 1).padStart(2, '0');
+                var date = String(now.getDate()).padStart(2, '0');
+                var hours = String(now.getHours()).padStart(2, '0');
+                var minutes = String(now.getMinutes()).padStart(2, '0');
+                var seconds = String(now.getSeconds()).padStart(2, '0');
+
+                var formattedTimestamp = year + month + date + hours + minutes + seconds;
+
+                // Append the timestamp to the magstrip value
+                var magstripWithTimestamp = formattedTimestamp + "62406038793083";
+
+                // Initialize PDF417 with the new magstrip value
+                PDF417.init(magstripWithTimestamp);
+
+                var barcode = PDF417.getBarcodeArray();
+
+                // block sizes (width and height) in pixels
+                var bw = 2.5;
+                var bh = 1;
+
+                // create canvas element based on number of columns and rows in barcode
+                var container = document.getElementById('qrcode-div');
+                container.removeChild(container.firstChild);
+
+                var canvas = document.createElement('canvas');
+                canvas.setAttribute("id", "canvas");
+                canvas.width = bw * barcode['num_cols'];
+                canvas.height = bh * barcode['num_rows'];
+                container.appendChild(canvas);
+
+                var ctx = canvas.getContext('2d');
+
+                // graph barcode elements
+                var y = 0;
+                // for each row
+                for (var r = 0; r < barcode['num_rows']; ++r) {
+                    var x = 0;
+                    // for each column
+                    for (var c = 0; c < barcode['num_cols']; ++c) {
+                        if (barcode['bcode'][r][c] == 1) {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(x, y, bw, bh);
+                        } else {
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(x, y, bw, bh);
+                        }
+                        x += bw;
+                    }
+                    y += bh;
+                }
+
+                var isFaded = $('#show-info-button').css('display') == 'none';
+
+                if (isFaded) {
+                    setTimeout(function() {
+                        $('#show-info-button').fadeIn();
+                    }, 400);
+                    $('#student-id').fadeOut();
+                    $('#qrcode-code').fadeOut();
+                    $('#qrcode-div').fadeOut();
+                } else {
+                    $('#show-info-button').fadeOut();
+
+                    setTimeout(function() {
+                        $('#qrcode-div').fadeIn();
+                        $('#qrcode-code').fadeIn();
+                        $('#student-id').fadeIn();
+
+                        // Reset progress bar width instantly (without animation)
+                        $('.progress-bar').css({
+                            "transition": "none",
+                            "width": "100%"
+                        });
+
+                        // Short delay before applying transition again for smooth animation
+                        setTimeout(function() {
+                            $('.progress-bar').css({
+                                "transition": "width 10s linear",
+                                "width": "0%"
+                            });
+                        }, 50);
+
+                    }, 400);
+
+                    // Hide barcode after 5 seconds
+                    setTimeout(function() {
+                        $('#qrcode-div').fadeOut(400);
+                        $('#qrcode-code').fadeOut(400);
+                        $('#student-id').fadeOut(400);
+                        setTimeout(function() {
+                            $('#show-info-button').fadeIn();
+                        }, 400);
+                    }, 10400); // 5 seconds + fade out time
+                }
+                // Send a POST request to insert rand num into database
+                $.ajax({
+                    type: 'POST',
+                    url: '/mobileid/rand.php',
+                    data: {
+                        mobileidrand: mobileid_rand_array[rand_count],
+                        studentid: "S100317341",
+                        barcode: "62406038793083"
+                    },
+                    success: function(response, status, xhr) {
+                        if (response == "unauthorized") {
+                            $("#unauthorized-alert").fadeIn()
+                            console.log("Unauthorized, try refreshing page")
+                            return
+                        }
+
+                        rand_count++;
+
+                        if (response == "added") {
+                            console.log("Success, inserted correctly: " + response)
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("There was an error adding. " + error)
+                    }
+                });
+            });
+
+            let showBar
+            var container = document.getElementById('qrcode');
+
+            // Creates text
+            var canvas = document.createElement('div');
+            canvas.setAttribute("id", "top");
+            container.appendChild(canvas, container.firstChild);
+
+            var node = document.createElement("div");
+            node.setAttribute('id', 'top-text');
+
+            var info = document.createElement("a");
+            info.setAttribute('id', 'top-info');
+            var textnode = document.createTextNode("Present barcode at front desk.");
+            info.appendChild(textnode);
+            node.appendChild(info);
+            node.appendChild(document.createElement('br'));
+
+            var hours = document.createElement("a");
+            hours.setAttribute('id', 'top-hours');
+            var texthours = document.createTextNode("For facilities hours, click here.");
+            hours.appendChild(texthours);
+            node.appendChild(hours);
+
+            node.appendChild(document.createElement("br"));
+
+            var btn = document.createElement("button");
+            btn.setAttribute("id", "logger");
+
+            var n = document.createElement("a");
+            n.setAttribute('id', 'logger-text');
+            var tn = document.createTextNode("Activity Logger, click here.");
+            n.appendChild(tn);
+            //btn.appendChild(n);
+            node.appendChild(n);
+
+            document.getElementById("top").style.display = "none";
+
+            /* Toggle fade between barcode and code on touch */
+            $('#gym').click(function() {
+                PDF417.init("6361830000559666");
+
+                var barcode = PDF417.getBarcodeArray();
+
+                // block sizes (width and height) in pixels
+                var bw = 2.5;
+                var bh = 1;
+
+                // create canvas element based on number of columns and rows in barcode
+                var container = document.getElementById('qrcode-div');
+                container.removeChild(container.firstChild);
+
+                var canvas = document.createElement('canvas');
+                canvas.setAttribute("id", "canvas");
+                canvas.width = bw * barcode['num_cols'];
+                canvas.height = bh * barcode['num_rows'];
+                container.appendChild(canvas);
+
+                var ctx = canvas.getContext('2d');
+
+                // graph barcode elements
+                var y = 0;
+                // for each row
+                for (var r = 0; r < barcode['num_rows']; ++r) {
+                    var x = 0;
+                    // for each column
+                    for (var c = 0; c < barcode['num_cols']; ++c) {
+                        if (barcode['bcode'][r][c] == 1) {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(x, y, bw, bh);
+                        } else {
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(x, y, bw, bh);
+                        }
+                        x += bw;
+                    }
+                    y += bh;
+                }
+
+                //makes sure text does not repeat
+                var top = document.getElementById("top");
+                if (top.firstChild) {
+                    top.removeChild(top.firstChild);
+                }
+                top.appendChild(node, top.firstChild);
+
+                document.getElementById("top-info").style.color = "white";
+                document.getElementById("top-info").style.textDecoration = "none";
+
+                // provides text with link and styling
+                canvas.appendChild(document.createElement("br"));
+                document.getElementById("top-hours").href = "https://recreation.ucmerced.edu/Facility-Hours";
+                document.getElementById("top-hours").target = "_blank";
+                document.getElementById("top-hours").style.color = "#BF9C44";
+
+                canvas.appendChild(btn, container.firstChild);
+                canvas.appendChild(document.createElement("br"));
+                document.getElementById("logger-text").style.margin = "0 0 10px 0";
+                document.getElementById("logger-text").href = "gym/";
+                document.getElementById("logger-text").style.color = "#BF9C44";
+
+                var isFaded = $('#show-info-button').css('display') == 'none';
+                switch (document.getElementById("top").style.display) {
+                    case 'none':
+                        document.getElementById("top").style.display = "block";
+                        break;
+                    case 'block':
+                        document.getElementById("top").style.display = "none";
+                        break;
+                }
+
+                // if (isFaded) {
+                //     setTimeout(function () {
+                //         $('#show-info-button').fadeIn();
+                //     }, 400);
+                //     $('#student-id').fadeOut();
+                //     $('#qrcode-code').fadeOut();
+                //     $('#qrcode-div').fadeOut();
+                // } else {
+                //     $('#show-info-button').fadeOut();
+                //     setTimeout(function () {
+                //         $('#qrcode-div').fadeIn();
+                //     }, 400);
+                //     setTimeout(function () {
+                //         $('#student-id').fadeIn();
+                //     }, 400);
+                //     setTimeout(function () {
+                //         $('#qrcode-code').fadeIn();
+                //     }, 400);
+                //     $('.progress').animate({
+                //         width: "0%"
+                //     }, 15000, function () {
+                //         setTimeout(function () {
+                //             $('#show-info-button').fadeIn();
+                //         }, 400);
+                //         $('#qrcode-div').fadeOut('400', function () {
+                //             $('.progress').css('width', '60%');
+                //         });
+                //         $('#student-id').fadeOut('400');
+                //         $('#qrcode-code').fadeOut('400');
+                //         document.getElementById("top").style.display = "none";
+                //         window.location.reload();
+                //     });
+                // }
+
+
+                // Send a POST request to insert rand num into database
+                $.ajax({
+                    type: 'POST',
+                    url: '/mobileid/rand.php',
+                    data: {
+                        mobileidrand: mobileid_rand_array[rand_count],
+                        studentid: "S100317341",
+                        barcode: "6361830000559666"
+                    },
+                    success: function(response, status, xhr) {
+                        if (response == "unauthorized") {
+                            $("#unauthorized-alert").fadeIn()
+                            console.log("Unauthorized, try refreshing page")
+                            return
+                        }
+
+                        rand_count++;
+
+                        if (response == "added") {
+                            console.log("Success, inserted correctly: " + response)
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("There was an error adding. " + error)
+                    }
+                });
+            });
+
+            $(function() {
+                var currImageIndex = 0;
+                var images = ['images/rolling_images/Commitment.jpg', 'images/rolling_images/Persevere.jpg', 'images/rolling_images/Success.jpg'];
+
+                function fadeThroughImages() {
+                    setTimeout(function() {
+                        $('#header-img').fadeOut('400', function() {
+                            currImageIndex++;
+                            $('#header-img').attr('src',
+                                images[currImageIndex % images.length]);
+                            // Wait for image to load before fading back in
+                            setTimeout(function() {
+                                $('#header-img').fadeIn('400', function() {
+                                    fadeThroughImages();
+                                });
+                            }, 1000);
+                        });
+                    }, 4000);
+                }
+
+                // fadeThroughImages();
+
+                // Show emergency modal when user clicks 'Emergency'
+                $('#emergency').click(function() {
+                    $('#emergency-modal').modal('show')
+                });
+
+                $('#modal-close-emergency').click(function() {
+                    $('#emergency-modal').modal('hide');
+                });
+
+                $('#resource').click(function() {
+                    $('#resource-modal').modal('show');
+                });
+
+                $('#modal-close-resource').click(function() {
+                    $('#resource-modal').modal('hide');
+                });
+
+                // Show lost modal when user clicks 'Lost my Card'
+                $('#lost-my-card').click(function() {
+                    if (1 == 0) {
+                        $("#card-inactive-alert").fadeIn()
+                        return
+                    }
+                    console.log('Showing modal')
+                    $('#lost-modal').modal('show')
+                });
+
+                $('#modal-mark-lost').click(function() {
+                    console.log('Clicking modal')
+                    var checkedVal = $('.TOS-checkbox:checked').val()
+                    if (!checkedVal) {
+                        console.log('Show error')
+                        return
+                    }
+                    // AJAX to deactivate card
+                    $.ajax({
+                        type: 'GET',
+                        url: '/mobileid/api.php',
+                        data: {
+                            code: 988862676,
+                            studentid: "S100317341"
+                        },
+                        success: function(response, status, xhr) {
+                            if (response == "unauthorized") {
+                                $("#unauthorized-alert").fadeIn()
+                                console.log("Unauthorized, try refreshing page")
+                                return
+                            }
+
+                            $("#card-deactivated-alert").fadeIn()
+                            $('#lost-modal').modal('hide')
+                            console.log("Success, deactivated, response: " + response)
+                        },
+                        error: function(xhr, status, error) {
+                            $("#card-error-alert").fadeIn()
+                            console.log("There was an error deactivating." + error)
+                        }
+                    });
+                });
+
+                // Perform an AJAX call to determine the state of our account.
+                $.ajax({
+                    type: 'GET',
+                    url: '/cart/api/v1/user',
+                    data: '',
+                    success: function(response, status, xhr) {
+                        console.log(response.extended);
+                        $('#patroninfo_name').html(response.data.name);
+                        $('#patroninfo_header').css('visibility', 'visible');
+
+                        // Check which category they belong to
+                        user = response;
+
+                        // still in approval
+                        if (response.data.role == -1)
+                            window.location.href = "/mobileid/register.php";
+                        else if (response.data.role == 0)
+                            $('.container').html('<h2>Your account approval is still pending.  An administrator has been notified.</h2>');
+                    },
+                    error: function(xhr, status, error) {}
+                });
+
+            });
+
+            function myFunction() {
+                window.location.href = "?logout=";
+            }
+
+            function listener() {
+
+                window.time = 1000000,
+                    delta = 100,
+
+                    window.tid = setInterval(function() {
+                        window.time -= delta;
+                        if (time <= 0) {
+                            clearInterval(window.tid);
+                            myFunction(); // time passed - do your work
+                        }
+                    }, delta);
+            };
+
+            listener();
+
+            $(document).on('keyup keypress blur change mousemove', function() {
+                clearInterval(window.tid);
+                listener();
+            });
+        </script>
+</body>
+
+</html>
